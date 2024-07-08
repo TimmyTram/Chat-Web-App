@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+import generateTokenAndSetCookie from "../utils/genToken.js";
 
 export const signup = async (req, res) => {
     try {
@@ -25,13 +26,19 @@ export const signup = async (req, res) => {
             password: hashedPassword
         });
 
-        await newUser.save();
+        if (newUser) {
+            // generate JWT token
+            generateTokenAndSetCookie(newUser._id, res);
+            await newUser.save();
 
-        res.status(201).json({
-            _id: newUser._id,
-            fullName: newUser.fullName,
-            username: newUser.username
-        });
+            res.status(201).json({
+                _id: newUser._id,
+                fullName: newUser.fullName,
+                username: newUser.username
+            });
+        } else {
+            res.status(400).json({error: "Invalid User Data."});
+        }
 
     } catch (error) {
         console.log("[ERROR]: Error in signup controller", error.message);
