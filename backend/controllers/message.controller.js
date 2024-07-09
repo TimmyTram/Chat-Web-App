@@ -29,8 +29,12 @@ export const sendMessage = async (req, res) => {
             conversation.messages.push(newMessage._id);
         }
 
-        await conversation.save();
-        await newMessage.save();
+        
+        // await conversation.save();
+        // await newMessage.save();
+
+        // this runs the two saves in parallel which saves time.
+        await Promise.all([conversation.save(), newMessage.save()]);
 
         res.status(201).json(newMessage);
 
@@ -39,3 +43,25 @@ export const sendMessage = async (req, res) => {
         res.status(500).json({error: "Interal Server Error"});
     }
 };
+
+export const getMessage = async (req, res) => {
+    try {
+        
+        const {id: userToChatId } = req.params;
+        const senderId = req.user._id; // user._id comes from protectRoute middleware
+        
+        const conversation = await Conversation.findOne({
+            participants: { $all: [senderId, userToChatId] }
+        })
+        .populate("messages"); // get actual message instead of ids.
+
+        if (!conversation) {
+            return res.status(200).json([]);
+        }
+
+        res.status(200).json(conversation.messages);
+    } catch (error) {
+        console.log("[ERROR]: Error in getMessage controller ", error.message);
+        res.status(500).json({error: "Interal Server Error"});
+    }
+}
