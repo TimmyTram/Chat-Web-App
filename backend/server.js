@@ -8,10 +8,10 @@ import userRoutes from "./routes/user.routes.js";
 
 import connectToMongoDB from './db/db.js';
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-
 dotenv.config();
+const PORT = process.env.PORT || 5000;
+
+const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
