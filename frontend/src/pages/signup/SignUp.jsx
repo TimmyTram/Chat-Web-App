@@ -87,7 +87,9 @@ const SignUp = () => {
           </Link>
 
           <div>
-            <button className="btn btn-block btn-sm mt-2">SIGNUP</button>
+            <button className="btn btn-block btn-sm mt-2" disabled={loading}>
+              {loading ? <span className="loading loading-spinner"></span> : "SIGNUP"}
+            </button>
           </div>
         </form>
       </div>
